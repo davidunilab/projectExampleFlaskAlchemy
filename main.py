@@ -38,15 +38,15 @@ class PostModel(db.Model):
     def __repr__(self):
         return '<Post %r>' % self.title
 
-# quit()
 
 
-
+# TODO: create request parser from posts
 userParser = reqparse.RequestParser()
 userParser.add_argument("username", type=str, help="user name should be string")
 userParser.add_argument("email", type=str, help="Email should be string")
 
 
+# TODO: Implement class methods (CRUD)
 class Post(Resource):
     def get(self, post_id):
         pass
