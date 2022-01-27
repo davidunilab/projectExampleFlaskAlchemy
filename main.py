@@ -1,12 +1,19 @@
-from flask import Flask
+from flask import Flask, jsonify, request
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse, fields, marshal_with
+
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+
+
 
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #ar gvinda modifikaciebis trrackingi
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  #ar gvinda modifikaciebis trrackingi
+app.config["JWT_SECRET_KEY"] = "our-secret-key"  # Change this!
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
 
 resource_fiels = {            #stringad rom gadaiqces rata postmenma waikitxos user getshi
@@ -20,6 +27,14 @@ resource_posts = {
     "body": fields.String,
     "user_id": fields.Integer
 }
+
+
+registerparser = reqparse.RequestParser()
+registerparser.add_argument("email", type=str, required=True, help='Email must be string')
+registerparser.add_argument("password", type=str, required=True, help='Password must be string')
+registerparser.add_argument("username", type=str, help='user_name must be string')
+
+
 
 userparser = reqparse.RequestParser()
 userparser.add_argument("username", type=str, help='user_name must be string')
@@ -70,6 +85,7 @@ class Post(Resource):
 
 class User(Resource):
     @marshal_with(resource_fiels)
+    @jwt_required()
     def get(self, user_id):
         if user_id == 999:
             return UserModel.query.all()
@@ -78,9 +94,11 @@ class User(Resource):
         return user
 
     @marshal_with(resource_fiels)
+    @jwt_required()
     def post(self, user_id):
         args = userparser.parse_args()
-        user = UserModel(username=args["username"], email=args["email"])
+        password = generate_password_hash(args['password'])
+        user = UserModel(username=args['password'], email=args["email"])
         db.session.add(user)
         db.session.commit()
         return "inserted"
@@ -105,11 +123,37 @@ class User(Resource):
         db.session.commit()
         return f"User with id {user_id} has been deleted"
 
+
+class Auth(Resource):
+    def post(self):
+        email = request.json.get("email", None)
+        password = request.json.get("password", None)
+
+        user = UserModel.query.filter_by(email=email).first()
+        if user == None:
+            return {"msg": "Email was not found"}
+
+        if email == user.email and check_password_hash(user.password, password):
+            return jsonify({"msg": "Bad username or password"}), 401
+
+        access_token = create_access_token(identity=user.username)
+        return jsonify(access_token=access_token)
+
+class Register(Resource):
+    def post(self):
+        args = registerparser.parse_args()
+        user = UserModel(username=args['username'], email=args['email'], password=generate_password_hash(args['password']))
+        db.session.add(user)
+        db.session.commit()
+        return {"msg":"created"}, 201
+
+
 class UserModel(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
 
     def __repr__(self):
         return f"User {self.username}"
@@ -126,8 +170,11 @@ class PostModel(db.Model):
 # db.create_all()
 # quit()
 
+
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(Post, '/post/<int:post_id>')
+api.add_resource(Auth, '/login')
+api.add_resource(Register, '/register')
 
 
 if __name__ == "__main__":
