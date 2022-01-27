@@ -1,22 +1,38 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse, fields, marshal_with
 
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 api = Api(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'Our-secret-key'
+
 
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
-resource_fiels = {
+resource_fields = {
     "id": fields.Integer,
     "username": fields.String,
     "email": fields.String,
 }
 
+class Auth(Resource):
+    def post(self):
+        username = request.json.get("username", None)
+        password = request.json.get("password", None)
+        if username != "test" or password != "test":
+            return jsonify({"msg": "Bad username or password"}), 401
+
+        access_token = create_access_token(identity=username)
+        return jsonify(access_token=access_token)
 
 class UserModel(db.Model):
     __tablename__ = 'users'
@@ -63,14 +79,15 @@ class Post(Resource):
 
 # CRUD
 class User(Resource):
-    @marshal_with(resource_fiels)
+    @marshal_with(resource_fields)
+    @jwt_required()
     def get(self, user_id):
         if user_id == 999:
             return UserModel.query.all()
         user = UserModel.query.filter_by(id=user_id).first()
         return user
 
-    @marshal_with(resource_fiels)
+    @marshal_with(resource_fields)
     def post(self, user_id):
         args = userParser.parse_args()
         user = UserModel(username=args["username"], email=args["email"])
@@ -78,7 +95,7 @@ class User(Resource):
         db.session.commit()
         return "inserted"
 
-    @marshal_with(resource_fiels)
+    @marshal_with(resource_fields)
     def put(self, user_id):
         args = userParser.parse_args()
         user = UserModel.query.filter_by(id=user_id).first()
@@ -101,7 +118,8 @@ class User(Resource):
 
 
 api.add_resource(User, '/user/<int:user_id>')
-api.add_resource(User, '/post/<int:post_id>')
+api.add_resource(Post, '/post/<int:post_id>')
+api.add_resource(Auth, '/login')
 
 
 if __name__ == "__main__":
