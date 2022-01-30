@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
-from werkzeug.security import generate_password_hash, check_password_hash
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse, fields, marshal_with
 
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 
@@ -10,13 +11,13 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  #ar gvinda modifikaciebis trrackingi
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
 app.config["JWT_SECRET_KEY"] = "our-secret-key"  # Change this!
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
 
-resource_fiels = {            #stringad rom gadaiqces rata postmenma waikitxos user getshi
+resource_fiels = {            
     "id": fields.Integer,
     "username": fields.String,
     "email": fields.String
@@ -29,10 +30,33 @@ resource_posts = {
 }
 
 
+
 registerparser = reqparse.RequestParser()
 registerparser.add_argument("email", type=str, required=True, help='Email must be string')
 registerparser.add_argument("password", type=str, required=True, help='Password must be string')
 registerparser.add_argument("username", type=str, help='user_name must be string')
+
+
+class UserModel(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+
+class PostModel(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    def __repr__(self):
+        return '<Post %r>' % self.title
+
 
 
 
@@ -40,11 +64,14 @@ userparser = reqparse.RequestParser()
 userparser.add_argument("username", type=str, help='user_name must be string')
 userparser.add_argument("email", type=str, help='Email must be string')
 
+
 postparser = reqparse.RequestParser()
 postparser.add_argument("id", type=int, help='Id must be integer')
 postparser.add_argument("title", type=str, help='Title must be string')
 postparser.add_argument("body", type=str, help='Body must be string')
 postparser.add_argument("user_id", type=int, help='User_id must be integer')
+
+
 class Post(Resource):
     @marshal_with(resource_posts)
     def get(self, post_id):
@@ -167,8 +194,8 @@ class PostModel(db.Model):
 
     def __repr__(self):
         return f"Post {self.title}"
-# db.create_all()
-# quit()
+
+      
 
 
 api.add_resource(User, '/user/<int:user_id>')
