@@ -54,6 +54,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="PLAIN_TEXT" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/models" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -102,7 +103,7 @@
       <workItem from="1643288902318" duration="2397000" />
       <workItem from="1643291352041" duration="4154000" />
       <workItem from="1643298048457" duration="5769000" />
-      <workItem from="1643641279364" duration="1547000" />
+      <workItem from="1643641279364" duration="4472000" />
     </task>
     <task id="LOCAL-00001" summary="added jwt auth">
       <created>1643291177496</created>
