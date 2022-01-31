@@ -204,5 +204,10 @@ api.add_resource(Auth, '/login')
 api.add_resource(Register, '/register')
 
 
+@app.before_first_request
+def before_first_request():
+    import seed
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
