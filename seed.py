@@ -1,5 +1,5 @@
 from faker import Faker
-from app import db, UserModel, PostModel
+from run import db, UserModel, PostModel
 from werkzeug.security import generate_password_hash
 from random import random
 db.create_all()
