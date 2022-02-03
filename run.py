@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
 
-resource_fiels = {            
+resource_fields = {
     "id": fields.Integer,
     "username": fields.String,
     "email": fields.String
@@ -111,7 +111,7 @@ class Post(Resource):
         return f"Post with id {post_id} has been deleted"
 
 class User(Resource):
-    @marshal_with(resource_fiels)
+    @marshal_with(resource_fields)
     @jwt_required()
     def get(self, user_id):
         if user_id == 999:
@@ -120,7 +120,7 @@ class User(Resource):
         user = UserModel.query.filter_by(id=user_id).first()
         return user
 
-    @marshal_with(resource_fiels)
+    @marshal_with(resource_fields)
     @jwt_required()
     def post(self, user_id):
         args = userparser.parse_args()
@@ -130,7 +130,7 @@ class User(Resource):
         db.session.commit()
         return "inserted"
 
-    @marshal_with(resource_fiels)
+    @marshal_with(resource_fields)
     def put(self, user_id):
         args = userparser.parse_args()
         user = UserModel.query.filter_by(id=user_id).first()
