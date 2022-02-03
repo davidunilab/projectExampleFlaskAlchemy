@@ -177,6 +177,7 @@ class Register(Resource):
 
 class UserModel(db.Model):
     __tablename__ = "users"
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -187,6 +188,7 @@ class UserModel(db.Model):
 
 class PostModel(db.Model):
     __tablename__ = 'posts'
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     body = db.Column(db.Text, nullable=False)
@@ -210,4 +212,4 @@ def before_first_request():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
