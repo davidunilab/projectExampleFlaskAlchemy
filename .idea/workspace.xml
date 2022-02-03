@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cf112d72-5a20-4e36-bf6b-a9e402652240" name="Changes" comment="added jwt auth">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,7 +149,7 @@
       <workItem from="1643291352041" duration="4154000" />
       <workItem from="1643298048457" duration="5769000" />
       <workItem from="1643641279364" duration="5069000" />
-      <workItem from="1643880888615" duration="4967000" />
+      <workItem from="1643880888615" duration="5680000" />
     </task>
     <task id="LOCAL-00001" summary="added jwt auth">
       <created>1643291177496</created>

@@ -172,7 +172,7 @@ class Register(Resource):
         user = UserModel(username=args['username'], email=args['email'], password=generate_password_hash(args['password']))
         db.session.add(user)
         db.session.commit()
-        return {"msg":"created"}, 201
+        return {"msg": "created"}, 201
 
 
 class UserModel(db.Model):
@@ -196,8 +196,6 @@ class PostModel(db.Model):
 
     def __repr__(self):
         return f"Post {self.title}"
-
-      
 
 
 api.add_resource(User, '/user/<int:user_id>')
